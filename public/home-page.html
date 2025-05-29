@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friends & Messages</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+        .error-style {
+            border: 2px solid #ff4444;
+            background-color: #ffeeee;
+            color: #ff0000;
+            box-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .error-message {
+            color: #ff4444;
+            font-size: 0.8em;
+            margin-top: 5px;
+            display: none;
+        }
+        /* Friends Section */
+        .friends-section {
+            width: 30%;
+            background-color: #fff;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .friends-header {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .friends-list {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .friend-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .friend-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .friend-item.active {
+            background-color: #e3f2fd;
+        }
+
+        .friend-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #2196F3;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .friend-name {
+            font-weight: 500;
+        }
+
+        /* Add Friend Section */
+        .add-friend {
+            padding: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .add-friend-input {
+            display: flex;
+        }
+
+        .add-friend-input input {
+            flex-grow: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+        }
+
+        .add-friend-input button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+
+        .add-friend-input button:hover {
+            background-color: #45a049;
+        }
+
+        /* Messages Section */
+        .messages-section {
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .messages-header {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            background-color: #fff;
+        }
+
+        .messages-container {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #e5ddd5;
+            background-image: url('https://web.whatsapp.com/img/bg-chat-tile-light_a4be512e7195b6b733d9110b408f075d.png');
+            background-repeat: repeat;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            max-width: 70%;
+            padding: 8px 12px;
+            border-radius: 7.5px;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message.received {
+            background-color: #fff;
+            align-self: flex-start;
+        }
+
+        .message.sent {
+            background-color: #dcf8c6;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #666;
+            text-align: right;
+            margin-top: 3px;
+        }
+
+        /* Message Input */
+        .message-input {
+            padding: 10px;
+            background-color: #fff;
+            display: flex;
+        }
+
+        .message-input input {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+
+        .message-input button {
+            margin-left: 10px;
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .message-input button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <!-- Friends Section -->
+    <div class="friends-section">
+        <div class="friends-header">
+            <h2>Friends</h2>
+        </div>
+        <div class="friends-list" id="friendsList">
+            <!-- Friends will be loaded here -->
+        </div>
+        <div class="add-friend">
+            <div class="add-friend-input">
+                <input type="text" id="friendNameInput" placeholder="Enter friend's name">
+                <button id="addFriendBtn">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages Section -->
+    <div class="messages-section">
+        <div class="messages-header" id="currentFriendHeader">
+            <h2>Select a friend to chat</h2>
+        </div>
+        <div class="messages-container" id="messagesContainer">
+            <!-- Messages will appear here -->
+            <div style="text-align: center; color: #666; margin-top: 20px;">
+                Select a friend to start chatting
+            </div>
+        </div>
+        <div class="message-input">
+            <input type="text" id="messageInput" placeholder="Type a message..." disabled>
+            <button id="sendMessageBtn" disabled>Send</button>
+        </div>
+    </div>
+
+     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        // DOM Elements
+        const friendsList = document.getElementById('friendsList');
+        const friendNameInput = document.getElementById('friendNameInput');
+        const addFriendBtn = document.getElementById('addFriendBtn');
+        const currentFriendHeader = document.getElementById('currentFriendHeader');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendMessageBtn = document.getElementById('sendMessageBtn');
+
+        // Data
+        let data
+        const url = window.location.href
+        axios.get(`${url}/friends`)
+        .then(response => {
+            data = response.data
+            renderFriendsList(response.data)
+        }) 
+        .catch(error => {
+            console.log(error)
+            throw error
+        });
+        let currentFriendname = null;
+
+        // Render friends list
+        function renderFriendsList(friends) {
+            friendsList.innerHTML = '';
+            
+            data.forEach(friend => {
+                const friendElement = document.createElement('div');
+                friendElement.className = `friend-item ${currentFriendname === friend.name ? 'active' : ''}`;
+                friendElement.dataset.name = friend.name;
+                
+                friendElement.innerHTML = `
+                    <div class="friend-avatar">${friend.name.charAt(0)}</div>
+                    <div>
+                        <div class="friend-name">${friend.name}</div>
+                    </div>
+                `;
+                
+                friendElement.addEventListener('click', () => selectFriend(friend.name));
+                friendsList.appendChild(friendElement);
+            });
+        }
+
+        // Select a friend to chat with
+        function selectFriend(friendName) {
+            currentFriendname = friendName;
+            console.log(friendName)
+            const friend = data.find(f => f.name === friendName);
+            
+            // Update UI
+            currentFriendHeader.innerHTML = `<h2>${friend.name}</h2>`;
+            document.querySelectorAll('.friend-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.name == friendName);
+            });
+            
+            // Enable message input
+            messageInput.disabled = false;
+            sendMessageBtn.disabled = false;
+            messageInput.focus();
+            
+            // Load messages
+            renderMessages();
+        }
+
+        // Render messages for the current friend
+        function renderMessages() {
+            messagesContainer.innerHTML = '';
+            let currentMassages = []
+            data.forEach(friend => {
+                if(friend.name === currentFriendname){
+                    currentMassages = friend.massagesRecived
+                    return
+                }
+            })
+            if (!currentFriendname || !currentMassages) {
+                messagesContainer.innerHTML = `
+                    <div style="text-align: center; color: #666; margin-top: 20px;">
+                        No messages yet with this friend
+                    </div>
+                `;
+                return;
+            }
+            
+            currentMassages.forEach(msg => {
+                const messageElement = document.createElement('div');
+                
+                messageElement.innerHTML = `
+                    <div>${msg}</div>
+                `;
+                
+                messagesContainer.appendChild(messageElement);
+            });
+            
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Add a new friend
+        function addFriend() {
+            const name = friendNameInput.value.trim();
+            if (name) {
+                axios.post(`${url}/add-friend`, {name: name})
+                .then(response => {
+                    console.log(response)
+                    if(response.data.success) {
+                        data.push({name: name, massagesRecived: []})
+                        renderFriendsList();
+                    }
+                    else {
+                        showError()
+                    }
+                })
+                .catch(error => {
+                    console.log(error)
+                    throw error
+                })
+                
+            }
+        }
+
+        // Send a message
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            if (text && currentFriendname) {
+                const newMessage = {
+                    text: text,
+                    sender: 'me',
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                };
+                
+                messages[currentFriendname].push(newMessage);
+                messageInput.value = '';
+                renderMessages();
+                
+                // Simulate a reply after 1-3 seconds
+                setTimeout(() => {
+                    const replies = [
+                        "That's interesting!",
+                        "I see what you mean",
+                        "Let me think about that",
+                        "Thanks for letting me know",
+                        "I agree with you",
+                        "Can we talk about this later?"
+                    ];
+                    
+                    const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                    
+                    const replyMessage = {
+                        text: randomReply,
+                        sender: 'friend',
+                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    };
+                    
+                    messages[currentFriendname].push(replyMessage);
+                    renderMessages();
+                }, 1000 + Math.random() * 2000);
+            }
+        }
+
+        // Set up event listeners
+        addFriendBtn.addEventListener('click', addFriend);
+        friendNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addFriend();
+        });
+        
+        sendMessageBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+        function showError() {
+            const input = document.getElementById('friendNameInput');
+            const originalValue = input.value;
+            
+            // Create error message element if it doesn't exist
+            let errorMsg = input.nextElementSibling;
+            if (!errorMsg || !errorMsg.classList.contains('error-message')) {
+                errorMsg = document.createElement('div');
+                errorMsg.className = 'error-message';
+                input.parentNode.insertBefore(errorMsg, input.nextSibling);
+            }
+
+            // Set error state
+            input.classList.add('error-style');
+            input.value = "Invalid input!";
+            errorMsg.textContent = "Please enter valid data";
+            errorMsg.style.display = 'block';
+
+            // Revert after 3 seconds
+            setTimeout(() => {
+                input.classList.remove('error-style');
+                input.value = originalValue;
+                errorMsg.style.display = 'none';
+            }, 3000);
+}
+    </script>
+</body>
+</html>
