@@ -364,6 +364,7 @@
                 data.forEach(friend => {
                     if(friend.name === currentFriendname) {
                         friend.massagesRecived.push(text)
+                        messageInput.value = '';
                         return
                     }
                 })
