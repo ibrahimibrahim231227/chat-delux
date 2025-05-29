@@ -3,7 +3,8 @@ const users = [{
     password: '',
     friends: [{
         name:'',
-        massagesRecived: []
+        massagesRecived: [],
+        massagesSent: []
     }]
 }]
 

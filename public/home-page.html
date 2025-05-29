@@ -245,6 +245,7 @@
         axios.get(`${url}/friends`)
         .then(response => {
             data = response.data
+            console.log(data)
             renderFriendsList(response.data)
         }) 
         .catch(error => {
@@ -301,11 +302,16 @@
             let currentMassages = []
             data.forEach(friend => {
                 if(friend.name === currentFriendname){
-                    currentMassages = friend.massagesRecived
+                    friend.massagesRecived.forEach(massage => {
+                        currentMassages.push({massage: massage, sender: `${currentFriendname}`})
+                    })
+                    friend.massagesSent.forEach(massage => {
+                        currentMassages.push({massage: massage, sender: `me`})
+                    })
                     return
                 }
             })
-            if (!currentFriendname || !currentMassages) {
+            if (!currentFriendname || !currentMassages || currentMassages.length === 0) {
                 messagesContainer.innerHTML = `
                     <div style="text-align: center; color: #666; margin-top: 20px;">
                         No messages yet with this friend
@@ -316,9 +322,8 @@
             
             currentMassages.forEach(msg => {
                 const messageElement = document.createElement('div');
-                
                 messageElement.innerHTML = `
-                    <div>${msg}</div>
+                    <div>${msg.massage}</div>
                 `;
                 
                 messagesContainer.appendChild(messageElement);
@@ -336,7 +341,7 @@
                 .then(response => {
                     console.log(response)
                     if(response.data.success) {
-                        data.push({name: name, massagesRecived: []})
+                        data.push({name: name, massagesRecived: [], massagesSent: []})
                         renderFriendsList();
                     }
                     else {
@@ -354,7 +359,21 @@
         // Send a message
         function sendMessage() {
             const text = messageInput.value.trim();
-            if (text && currentFriendname) {
+            axios.post(`${url}/send-massage`, {name: currentFriendname, massage: text})
+            .then(response => {
+                data.forEach(friend => {
+                    if(friend.name === currentFriendname) {
+                        friend.massagesRecived.push(text)
+                        return
+                    }
+                })
+                renderMessages()
+            })
+            .catch(error => {
+                console.log(error)
+                throw error
+            })
+           /* if (text && currentFriendname) {
                 const newMessage = {
                     text: text,
                     sender: 'me',
@@ -388,6 +407,7 @@
                     renderMessages();
                 }, 1000 + Math.random() * 2000);
             }
+                */
         }
 
         // Set up event listeners

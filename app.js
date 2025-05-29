@@ -8,7 +8,6 @@ app.use(express.urlencoded({extended: false}))
 app.post('/login', (req, res) => {
     let founded = false
     data.users.forEach((user) => {
-        console.log(user)
         if(user.name === req.body.name && user.password === req.body.password) {
             founded = true
             return
@@ -40,7 +39,6 @@ app.post('/sign-up', (req, res) => {
                 user.friends = []
             }
         })
-        console.log(data)
         res.json({success: true})
     }   
 })
@@ -56,8 +54,8 @@ app.get('/home-page/:user/friends', (req, res) => {
                 return
             }
             user.friends.forEach((friend) => {
-                const friendName = friend.name, friendMassages = friend.massagesRecived
-                neededData.push({name:friendName, massagesRecived:friendMassages})
+                const friendName = friend.name, friendMassagesR = friend.massagesRecived, friendMassagesS = friend.massagesSent
+                neededData.push({name:friendName, massagesRecived:friendMassagesR, massagesSent: friendMassagesS})
             })
             return
         }
@@ -71,19 +69,47 @@ app.post('/home-page/:user/add-friend', (req, res) => {
     data.users.forEach(user => {
         if(user.name === req.body.name && user.name !== userName) {
             founded = true
-            user.friends.push({name: userName, massagesRecived: []})
+            user.friends.push({name: userName, massagesRecived: [], massagesSent: []})
             return
         }
     })
     if(founded) {
         data.users.forEach(user => {
             if(user.name == userName){
-                user.friends.push({name: req.body.name, massagesRecived: []})
+                user.friends.push({name: req.body.name, massagesRecived: [], massagesSent: []})
                 return
             }
         })
     }
     res.json({success: founded})
+})
+app.post('/home-page/:user/send-massage', (req, res) => {
+    const userName = req.params.user
+    const needName = req.body.name
+    const needMassage = req.body.massage
+    data.users.forEach(user => {
+        if(user.name === needName) {
+            user.friends.forEach(friend => {
+                if(friend.name === userName) {
+                    friend.massagesRecived.push(needMassage)
+                    return
+                }
+            })
+            return
+        }
+    })
+    data.users.forEach(user => {
+        if(user.name === userName) {
+            user.friends.forEach(friend => {
+                if(friend.name === needName) {
+                    friend.massagesSent.push(needMassage)
+                    return
+                }
+            })
+            return
+        }
+    })
+    res.json({success: 1})
 })
 app.all('/*splits', (req, res) => {
     res.status(404).send('Page Not Found')
