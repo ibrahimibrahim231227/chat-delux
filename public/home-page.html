@@ -191,6 +191,14 @@
         .message-input button:hover {
             background-color: #45a049;
         }
+        .friend-message-div{
+            color: black;
+            background-color: rgb(100,100,250);
+        }
+         .my-message-div{
+            color: black;
+            background-color: rgb(100, 250, 162);
+        }
     </style>
 </head>
 <body>
@@ -322,10 +330,16 @@
             
             currentMassages.forEach(msg => {
                 const messageElement = document.createElement('div');
-                messageElement.innerHTML = `
-                    <div>${msg.massage}</div>
-                `;
-                
+                if(msg.sender === 'me'){
+                    messageElement.innerHTML = `
+                    <div class='my-message-div'>${msg.massage}</div>
+                     `;
+                }
+                else{
+                    messageElement.innerHTML = `
+                    <div class='friend-message-div'>${msg.massage}</div>
+                     `;
+                }
                 messagesContainer.appendChild(messageElement);
             });
             
