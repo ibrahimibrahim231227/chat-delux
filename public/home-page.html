@@ -131,7 +131,7 @@
             flex-grow: 1;
             padding: 15px;
             overflow-y: auto;
-            background-color: #e5ddd5;
+            background-color: rgb(245, 235, 218);
             background-image: url('https://web.whatsapp.com/img/bg-chat-tile-light_a4be512e7195b6b733d9110b408f075d.png');
             background-repeat: repeat;
         }
@@ -192,16 +192,35 @@
             background-color: #45a049;
         }
         .friend-message-div{
-            color: black;
-            background-color: rgb(100, 207, 250);
-            width: 100;
-            align-items: first baseline;
+             border-top-left-radius: 10;
+            box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
+            padding: 8px 8px;
+            border-radius: 50px;
+            word-wrap: break-word;
+            line-height: 1.4;
+            width: 10%;
+            background-color: #bac8eb;
+            margin-left: auto;
         }
          .my-message-div{
-            color: black;
-            background-color: rgb(100, 250, 152);
-            width: 100;
-            align-items: end;
+            border-top-left-radius: 10;
+            box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
+            padding: 10px 15px;
+            border-radius: 50px;
+            word-wrap: break-word;
+            line-height: 1.4;
+            max-width: 50%; 
+            min-width: 1%;
+            width: fit-content;
+            background-color: #c5ebba;
+            margin-right: auto;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        .rm{
+            color: rgb(85, 85, 85);
+            margin-left: auto;
+            padding-left: 5px;
         }
     </style>
 </head>
@@ -334,14 +353,21 @@
             
             currentMassages.forEach(msg => {
                 const messageElement = document.createElement('div');
+                console.log(msg.sender)
                 if(msg.sender === 'me'){
                     messageElement.innerHTML = `
-                    <div class='my-message-div'>${msg.massage}</div>
+                    <div class="my-message-div">
+                        <div class="rm">
+                        ${msg.massage}
+                        </div>
+                    </div>
                      `;
                 }
                 else{
                     messageElement.innerHTML = `
-                    <div class='friend-message-div'>${msg.massage}</div>
+                    <div class="friend-message-div">
+                        ${msg.massage}
+                    </div>
                      `;
                 }
                 messagesContainer.appendChild(messageElement);
@@ -381,7 +407,7 @@
             .then(response => {
                 data.forEach(friend => {
                     if(friend.name === currentFriendname) {
-                        friend.massagesRecived.push(text)
+                        friend.massagesSent.push(text)
                         messageInput.value = '';
                         return
                     }
