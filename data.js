@@ -8,5 +8,6 @@ const users = [{
             sender: ''
         }]
     }],
+    shouldRefresh: false
 }]
 module.exports = {users}

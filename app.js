@@ -110,6 +110,28 @@ app.post('/home-page/:user/send-massage', (req, res) => {
     })
     res.json({success: 1})
 })
+app.get('/home-page/:user/recive-massage', (req, res) => {
+    data.users.forEach((user) => {
+        if(user.name == req.params.user) {
+            user.shouldRefresh = true
+            return
+        }
+    })
+    res.json(1)
+})
+app.get('/home-page/:user/should-refresh', (req, res) => {
+    let need = false
+    let needData
+    data.users.forEach((user) => {
+        if(user.name == req.params.user) {
+            need = user.shouldRefresh
+            needData = user.friends
+            user.shouldRefresh = false
+            return
+        }
+    })
+    res.json({neededData: needData, need: need})
+})
 app.all('/*splits', (req, res) => {
     res.status(404).send('Page Not Found')
 })

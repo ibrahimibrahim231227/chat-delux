@@ -132,7 +132,6 @@
             padding: 15px;
             overflow-y: auto;
             background-color: rgb(245, 235, 218);
-            background-image: url('https://web.whatsapp.com/img/bg-chat-tile-light_a4be512e7195b6b733d9110b408f075d.png');
             background-repeat: repeat;
         }
 
@@ -266,7 +265,6 @@
     </div>
 
      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
     <script>
         // DOM Elements
         const friendsList = document.getElementById('friendsList');
@@ -284,13 +282,22 @@
         .then(response => {
             data = response.data.neededData
             userName = response.data.username
-            console.log(response.data)
             renderFriendsList(response.data)
         }) 
-        .catch(error => {
-            console.log(error)
-            throw error
-        });
+        setInterval(() => {
+            axios.get(`${url}/should-refresh`)
+            .then(response => {
+                if(response.data.need) {
+                    data = response.data.neededData
+                    renderMessages()
+                }
+            })
+            .catch(error => {
+                console.log(error)
+                throw error
+            }); 
+        }, 100)
+        const str = userName
         let currentFriendname = null;
 
         // Render friends list
@@ -330,7 +337,6 @@
             messageInput.disabled = false;
             sendMessageBtn.disabled = false;
             messageInput.focus();
-            
             // Load messages
             renderMessages();
         }
@@ -415,6 +421,14 @@
                         friend.chat.push({massage:text, sender: 'me'})
                         return
                     }
+                })
+                axios.get(`/home-page/${currentFriendname}/recive-massage`)
+                .then(response => {
+
+                })
+                .catch(error => {
+                    console.log(error)
+                    throw error
                 })
                 messageInput.value = '';
                 renderMessages()
