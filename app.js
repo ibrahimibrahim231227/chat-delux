@@ -54,29 +54,28 @@ app.get('/home-page/:user/friends', (req, res) => {
                 return
             }
             user.friends.forEach((friend) => {
-                const friendName = friend.name, friendMassagesR = friend.massagesRecived, friendMassagesS = friend.massagesSent
-                neededData.push({name:friendName, massagesRecived:friendMassagesR, massagesSent: friendMassagesS})
+                const friendName = friend.name
+                neededData.push({name:friendName, chat: friend.chat})
             })
             return
         }
     })
-    res.json(neededData)
+    res.json({neededData:neededData, username: userName})
 })
 app.post('/home-page/:user/add-friend', (req, res) => {
     const userName = req.params.user
-    console.log(userName)
     let founded = false
     data.users.forEach(user => {
         if(user.name === req.body.name && user.name !== userName) {
             founded = true
-            user.friends.push({name: userName, massagesRecived: [], massagesSent: []})
+            user.friends.push({name: userName, chat: []})
             return
         }
     })
     if(founded) {
         data.users.forEach(user => {
             if(user.name == userName){
-                user.friends.push({name: req.body.name, massagesRecived: [], massagesSent: []})
+                user.friends.push({name: req.body.name, chat: []})
                 return
             }
         })
@@ -91,7 +90,7 @@ app.post('/home-page/:user/send-massage', (req, res) => {
         if(user.name === needName) {
             user.friends.forEach(friend => {
                 if(friend.name === userName) {
-                    friend.massagesRecived.push(needMassage)
+                    friend.chat.push({massage: needMassage, sender: userName})
                     return
                 }
             })
@@ -102,7 +101,7 @@ app.post('/home-page/:user/send-massage', (req, res) => {
         if(user.name === userName) {
             user.friends.forEach(friend => {
                 if(friend.name === needName) {
-                    friend.massagesSent.push(needMassage)
+                    friend.chat.push({massage:needMassage, sender: userName})
                     return
                 }
             })

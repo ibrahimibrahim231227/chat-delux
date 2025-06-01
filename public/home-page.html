@@ -278,12 +278,13 @@
         const sendMessageBtn = document.getElementById('sendMessageBtn');
 
         // Data
-        let data
         const url = window.location.href
+        let data, userName
         axios.get(`${url}/friends`)
         .then(response => {
-            data = response.data
-            console.log(data)
+            data = response.data.neededData
+            userName = response.data.username
+            console.log(response.data)
             renderFriendsList(response.data)
         }) 
         .catch(error => {
@@ -340,11 +341,8 @@
             let currentMassages = []
             data.forEach(friend => {
                 if(friend.name === currentFriendname){
-                    friend.massagesRecived.forEach(massage => {
-                        currentMassages.push({massage: massage, sender: `${currentFriendname}`})
-                    })
-                    friend.massagesSent.forEach(massage => {
-                        currentMassages.push({massage: massage, sender: `me`})
+                    friend.chat.forEach(massage => {
+                        currentMassages.push({massage: massage.massage, sender: massage.sender})
                     })
                     return
                 }
@@ -360,8 +358,7 @@
             
             currentMassages.forEach(msg => {
                 const messageElement = document.createElement('div');
-                console.log(msg.sender)
-                if(msg.sender === 'me'){
+                if(msg.sender !== currentFriendname){
                     messageElement.innerHTML = `
                     <div class="my-message-div">
                         <div class="rm">
@@ -385,7 +382,6 @@
             // Scroll to bottom
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
-
         // Add a new friend
         function addFriend() {
             const name = friendNameInput.value.trim();
@@ -394,7 +390,7 @@
                 .then(response => {
                     console.log(response)
                     if(response.data.success) {
-                        data.push({name: name, massagesRecived: [], massagesSent: []})
+                        data.push({name: name, chat:[]})
                         renderFriendsList();
                     }
                     else {
@@ -416,52 +412,17 @@
             .then(response => {
                 data.forEach(friend => {
                     if(friend.name === currentFriendname) {
-                        friend.massagesSent.push(text)
-                        messageInput.value = '';
+                        friend.chat.push({massage:text, sender: 'me'})
                         return
                     }
                 })
+                messageInput.value = '';
                 renderMessages()
             })
             .catch(error => {
                 console.log(error)
                 throw error
             })
-           /* if (text && currentFriendname) {
-                const newMessage = {
-                    text: text,
-                    sender: 'me',
-                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                };
-                
-                messages[currentFriendname].push(newMessage);
-                messageInput.value = '';
-                renderMessages();
-                
-                // Simulate a reply after 1-3 seconds
-                setTimeout(() => {
-                    const replies = [
-                        "That's interesting!",
-                        "I see what you mean",
-                        "Let me think about that",
-                        "Thanks for letting me know",
-                        "I agree with you",
-                        "Can we talk about this later?"
-                    ];
-                    
-                    const randomReply = replies[Math.floor(Math.random() * replies.length)];
-                    
-                    const replyMessage = {
-                        text: randomReply,
-                        sender: 'friend',
-                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                    };
-                    
-                    messages[currentFriendname].push(replyMessage);
-                    renderMessages();
-                }, 1000 + Math.random() * 2000);
-            }
-                */
         }
 
         // Set up event listeners

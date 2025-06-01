@@ -3,9 +3,10 @@ const users = [{
     password: '',
     friends: [{
         name:'',
-        massagesRecived: [],
-        massagesSent: []
-    }]
+        chat: [{
+            massage: '',
+            sender: ''
+        }]
+    }],
 }]
-
 module.exports = {users}
